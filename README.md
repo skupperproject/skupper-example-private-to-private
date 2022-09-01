@@ -88,16 +88,16 @@ Start a console session for each of your namespaces.  Set the
 `KUBECONFIG` environment variable to a different path in each
 session.
 
-_**Console for relay:**_
-
-~~~ shell
-export KUBECONFIG=~/.kube/config-relay
-~~~
-
 _**Console for private1:**_
 
 ~~~ shell
 export KUBECONFIG=~/.kube/config-private1
+~~~
+
+_**Console for relay:**_
+
+~~~ shell
+export KUBECONFIG=~/.kube/config-relay
 ~~~
 
 _**Console for private2:**_
@@ -121,18 +121,18 @@ Use `kubectl create namespace` to create the namespaces you wish
 to use (or use existing namespaces).  Use `kubectl config
 set-context` to set the current namespace for each session.
 
-_**Console for relay:**_
-
-~~~ shell
-kubectl create namespace relay
-kubectl config set-context --current --namespace relay
-~~~
-
 _**Console for private1:**_
 
 ~~~ shell
 kubectl create namespace private1
 kubectl config set-context --current --namespace private1
+~~~
+
+_**Console for relay:**_
+
+~~~ shell
+kubectl create namespace relay
+kubectl config set-context --current --namespace relay
 ~~~
 
 _**Console for private2:**_
@@ -153,13 +153,13 @@ tunnel`][minikube-tunnel] before you install Skupper.
 
 [minikube-tunnel]: https://skupper.io/start/minikube.html#running-minikube-tunnel
 
-_**Console for relay:**_
+_**Console for private1:**_
 
 ~~~ shell
 skupper init
 ~~~
 
-_**Console for private1:**_
+_**Console for relay:**_
 
 ~~~ shell
 skupper init
@@ -184,13 +184,13 @@ Skupper is now installed in namespace '<namespace>'.  Use 'skupper status' to ge
 Use `skupper status` in each console to check that Skupper is
 installed.
 
-_**Console for relay:**_
+_**Console for private1:**_
 
 ~~~ shell
 skupper status
 ~~~
 
-_**Console for private1:**_
+_**Console for relay:**_
 
 ~~~ shell
 skupper status
@@ -302,7 +302,6 @@ _**Console for private1:**_
 
 ~~~ shell
 kubectl expose deployment/frontend --port 8080 --type LoadBalancer
-sleep 86400
 ~~~
 
 _Sample output:_
@@ -322,7 +321,7 @@ that address.
 **Note:** The `<external-ip>` field in the following commands is a
 placeholder.  The actual value is an IP address.
 
-_**Console for relay:**_
+_**Console for private1:**_
 
 ~~~ shell
 kubectl get service/frontend
@@ -355,7 +354,7 @@ password.
 following output are placeholders.  The actual values are specific
 to your environment.
 
-_**Console for relay:**_
+_**Console for private1:**_
 
 ~~~ shell
 skupper status
@@ -366,7 +365,7 @@ _Sample output:_
 
 ~~~ console
 $ skupper status
-Skupper is enabled for namespace "relay" in interior mode. It is connected to 1 other site. It has 1 exposed service.
+Skupper is enabled for namespace "private1" in interior mode. It is connected to 1 other site. It has 1 exposed service.
 The site console url is: <console-url>
 The credentials for internal console-auth mode are held in secret: 'skupper-console-users'
 
@@ -382,18 +381,18 @@ in as user `admin` and enter the password.
 To remove Skupper and the other resources from this exercise, use
 the following commands.
 
-_**Console for relay:**_
-
-~~~ shell
-skupper delete
-~~~
-
 _**Console for private1:**_
 
 ~~~ shell
 skupper delete
 kubectl delete service/frontend
 kubectl delete deployment/frontend
+~~~
+
+_**Console for relay:**_
+
+~~~ shell
+skupper delete
 ~~~
 
 _**Console for private2:**_
