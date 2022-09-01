@@ -21,6 +21,8 @@ steps:
   - standard: install_skupper_in_your_namespaces
   - standard: check_the_status_of_your_namespaces
   - title: Link your namespaces
+    preamble: |
+      XXX
     commands:
       relay:
         - run: skupper token create ~/relay1.token
@@ -36,10 +38,8 @@ steps:
     commands:
       private1:
         - run: kubectl create deployment frontend --image quay.io/skupper/hello-world-frontend
-          output: deployment.apps/frontend created
       private2:
         - run: kubectl create deployment backend --image quay.io/skupper/hello-world-backend --replicas 3
-          output: deployment.apps/backend created
   - title: Expose the backend service
     preamble: |
       We now have two namespaces linked to form a Skupper network, but
