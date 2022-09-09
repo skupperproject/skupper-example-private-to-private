@@ -1,6 +1,6 @@
 title: Skupper Hello World private to private
 subtitle: Connect services in isolated on-prem sites
-github_actions_url: https://github.com/ssorj/skupper-example-private-to-private/actions/workflows/main.yaml
+github_actions_url: https://github.com/skupperproject/skupper-example-private-to-private/actions/workflows/main.yaml
 overview: |
   This example is a basic multi-service HTTP application deployed
   across two Kubernetes clusters, each in its own private data center.
@@ -9,7 +9,7 @@ overview: |
 
   * A backend service that exposes an `/api/hello` endpoint.  It
     returns greetings of the form `Hi, <your-name>.  I am <my-name>
-    (<pod-name>)`.
+    (<pod>)`.
 
   * A frontend service that sends greetings to the backend and
     fetches new greetings in response.
