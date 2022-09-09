@@ -1,8 +1,8 @@
-# Skupper private to private
+# Skupper Hello World private to private
 
 [![main](https://github.com/ssorj/skupper-example-private-to-private/actions/workflows/main.yaml/badge.svg)](https://github.com/ssorj/skupper-example-private-to-private/actions/workflows/main.yaml)
 
-#### Connecting services in isolated on-premises sites
+#### Connect services in isolated on-prem sites
 
 This example is part of a [suite of examples][examples] showing the
 different ways you can use [Skupper][website] to connect services
@@ -32,7 +32,23 @@ across cloud providers, data centers, and edge sites.
 
 ## Overview
 
-XXX
+This example is a basic multi-service HTTP application deployed
+across two Kubernetes clusters, each in its own private data center.
+
+It contains two services:
+
+* A backend service that exposes an `/api/hello` endpoint.  It
+  returns greetings of the form `Hi, <your-name>.  I am <my-name>
+  (<pod-name>)`.
+
+* A frontend service that sends greetings to the backend and
+  fetches new greetings in response.
+
+The backend service runs in on-prem cluster "private1", and the
+frontend service runs in on-prem cluster "private2".  The privates
+sites are linked by a relay site in the public cloud.  Skupper
+enables the frontend to connect to the backend without a VPN or
+special firewall rules.
 
 ## Prerequisites
 
@@ -43,7 +59,7 @@ XXX
   choose][kube-providers]
 
 [install-kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
-[kube-providers]: https://skupper.io/start/index.html#prerequisites
+[kube-providers]: https://skupper.io/start/kubernetes.html
 
 ## Step 1: Install the Skupper command-line tool
 
@@ -215,6 +231,23 @@ any time to check your progress.
 
 ## Step 7: Link your namespaces
 
+Creating a link requires use of two `skupper` commands in
+conjunction, `skupper token create` and `skupper link create`.
+
+The `skupper token create` command generates a secret token that
+signifies permission to create a link.  The token also carries the
+link details.  Then, in a remote namespace, The `skupper link
+create` command uses the token to create a link to the namespace
+that generated it.
+
+**Note:** The link token is truly a *secret*.  Anyone who has the
+token can link to your namespace.  Make sure that only those you
+trust have access to it.
+
+First, use `skupper token create` in one namespace to generate the
+token.  Then, use `skupper link create` in the other to create a
+link.
+
 _**Console for relay:**_
 
 ~~~ shell
@@ -234,6 +267,11 @@ _**Console for private2:**_
 skupper link create ~/relay2.token
 ~~~
 
+If your console sessions are on different machines, you may need
+to use `sftp` or a similar tool to transfer the token securely.
+By default, tokens expire after a single use or 15 minutes after
+creation.
+
 ## Step 8: Deploy the frontend and backend services
 
 Use `kubectl create deployment` to deploy the frontend service
@@ -245,24 +283,10 @@ _**Console for private1:**_
 kubectl create deployment frontend --image quay.io/skupper/hello-world-frontend
 ~~~
 
-_Sample output:_
-
-~~~ console
-$ kubectl create deployment frontend --image quay.io/skupper/hello-world-frontend
-deployment.apps/frontend created
-~~~
-
 _**Console for private2:**_
 
 ~~~ shell
 kubectl create deployment backend --image quay.io/skupper/hello-world-backend --replicas 3
-~~~
-
-_Sample output:_
-
-~~~ console
-$ kubectl create deployment backend --image quay.io/skupper/hello-world-backend --replicas 3
-deployment.apps/backend created
 ~~~
 
 ## Step 9: Expose the backend service

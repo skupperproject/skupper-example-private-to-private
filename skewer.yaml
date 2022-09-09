@@ -1,8 +1,24 @@
-title: Skupper private to private
-subtitle: Connecting services in isolated on-premises sites
+title: Skupper Hello World private to private
+subtitle: Connect services in isolated on-prem sites
 github_actions_url: https://github.com/ssorj/skupper-example-private-to-private/actions/workflows/main.yaml
 overview: |
-  XXX
+  This example is a basic multi-service HTTP application deployed
+  across two Kubernetes clusters, each in its own private data center.
+
+  It contains two services:
+
+  * A backend service that exposes an `/api/hello` endpoint.  It
+    returns greetings of the form `Hi, <your-name>.  I am <my-name>
+    (<pod-name>)`.
+
+  * A frontend service that sends greetings to the backend and
+    fetches new greetings in response.
+
+  The backend service runs in on-prem cluster "private1", and the
+  frontend service runs in on-prem cluster "private2".  The privates
+  sites are linked by a relay site in the public cloud.  Skupper
+  enables the frontend to connect to the backend without a VPN or
+  special firewall rules.
 sites:
   private1:
     kubeconfig: ~/.kube/config-private1
@@ -20,9 +36,7 @@ steps:
   - standard: set_up_your_namespaces
   - standard: install_skupper_in_your_namespaces
   - standard: check_the_status_of_your_namespaces
-  - title: Link your namespaces
-    preamble: |
-      XXX
+  - standard: link_your_namespaces
     commands:
       relay:
         - run: skupper token create ~/relay1.token
