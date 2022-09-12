@@ -50,6 +50,8 @@ sites are linked by a relay site in the public cloud.  Skupper
 enables the frontend to connect to the backend without a VPN or
 special firewall rules.
 
+<img src="images/entities.svg" style="max-width: 100%;"/>
+
 ## Prerequisites
 
 * The `kubectl` command-line tool, version 1.15 or later

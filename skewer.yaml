@@ -19,6 +19,8 @@ overview: |
   sites are linked by a relay site in the public cloud.  Skupper
   enables the frontend to connect to the backend without a VPN or
   special firewall rules.
+
+  <img src="images/entities.svg" style="max-width: 100%;"/>
 sites:
   private1:
     kubeconfig: ~/.kube/config-private1
