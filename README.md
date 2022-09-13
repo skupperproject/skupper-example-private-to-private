@@ -41,8 +41,8 @@ It contains two services:
   returns greetings of the form `Hi, <your-name>.  I am <my-name>
   (<pod>)`.
 
-* A frontend service that sends greetings to the backend and
-  fetches new greetings in response.
+* A frontend service that connects to the backend.  It sends
+  greetings to the backend and fetches new greetings in response.
 
 The backend service runs in on-prem cluster "private1", and the
 frontend service runs in on-prem cluster "private2".  The private
