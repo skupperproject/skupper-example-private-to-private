@@ -45,10 +45,10 @@ It contains two services:
   fetches new greetings in response.
 
 The backend service runs in on-prem cluster "private1", and the
-frontend service runs in on-prem cluster "private2".  The privates
+frontend service runs in on-prem cluster "private2".  The private
 sites are linked by a relay site in the public cloud.  Skupper
-enables the frontend to connect to the backend without a VPN or
-special firewall rules.
+enables the frontend to connect to the backend over a secure
+dedicated application network.
 
 <img src="images/entities.svg" style="max-width: 100%;"/>
 
