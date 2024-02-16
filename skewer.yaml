@@ -48,11 +48,21 @@ steps:
     commands:
       relay:
         - run: skupper token create ~/relay1.token
+          output: |
+            Token written to ~/relay1.token
         - run: skupper token create ~/relay2.token
+          output: |
+            Token written to ~/relay2.token
       private1:
         - run: skupper link create ~/relay1.token
+          output: |
+            Site configured to link to https://10.106.89.17:8081/76f8f557-ccd2-11ee-865d-04421a4c5042 (name=link1)
+            Check the status of the link using 'skupper link status'.
       private2:
         - run: skupper link create ~/relay2.token
+          output: |
+            Site configured to link to https://10.106.89.17:8081/775fb7d6-ccd2-11ee-aab9-04421a4c5042 (name=link1)
+            Check the status of the link using 'skupper link status'.
   - standard: hello_world/expose_the_backend
   - standard: hello_world/access_the_frontend
   - standard: hello_world/cleaning_up
@@ -61,8 +71,8 @@ steps:
         - run: skupper delete
         - run: kubectl delete service/frontend
         - run: kubectl delete deployment/frontend
-      relay:
-        - run: skupper delete
       private2:
         - run: skupper delete
         - run: kubectl delete deployment/backend
+      relay:
+        - run: skupper delete

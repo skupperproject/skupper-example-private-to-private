@@ -268,16 +268,42 @@ skupper token create ~/relay1.token
 skupper token create ~/relay2.token
 ~~~
 
+_Sample output:_
+
+~~~ console
+$ skupper token create ~/relay1.token
+Token written to ~/relay1.token
+
+$ skupper token create ~/relay2.token
+Token written to ~/relay2.token
+~~~
+
 _**Private 1:**_
 
 ~~~ shell
 skupper link create ~/relay1.token
 ~~~
 
+_Sample output:_
+
+~~~ console
+$ skupper link create ~/relay1.token
+Site configured to link to https://10.106.89.17:8081/76f8f557-ccd2-11ee-865d-04421a4c5042 (name=link1)
+Check the status of the link using 'skupper link status'.
+~~~
+
 _**Private 2:**_
 
 ~~~ shell
 skupper link create ~/relay2.token
+~~~
+
+_Sample output:_
+
+~~~ console
+$ skupper link create ~/relay2.token
+Site configured to link to https://10.106.89.17:8081/775fb7d6-ccd2-11ee-aab9-04421a4c5042 (name=link1)
+Check the status of the link using 'skupper link status'.
 ~~~
 
 If your terminal sessions are on different machines, you may need
