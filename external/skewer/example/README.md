@@ -1,8 +1,8 @@
-# Skupper Hello World private to private
+# Skupper Hello World
 
-[![main](https://github.com/skupperproject/skupper-example-private-to-private/actions/workflows/main.yaml/badge.svg)](https://github.com/skupperproject/skupper-example-private-to-private/actions/workflows/main.yaml)
+[![main](https://github.com/skupperproject/skewer/actions/workflows/main.yaml/badge.svg)](https://github.com/skupperproject/skewer/actions/workflows/main.yaml)
 
-#### Connect services in isolated on-prem sites
+#### A minimal HTTP application deployed across Kubernetes clusters using Skupper
 
 This example is part of a [suite of examples][examples] showing the
 different ways you can use [Skupper][website] to connect services
@@ -20,8 +20,9 @@ across cloud providers, data centers, and edge sites.
 * [Step 3: Deploy the frontend and backend](#step-3-deploy-the-frontend-and-backend)
 * [Step 4: Create your sites](#step-4-create-your-sites)
 * [Step 5: Link your sites](#step-5-link-your-sites)
-* [Step 6: Expose the backend](#step-6-expose-the-backend)
-* [Step 7: Access the frontend](#step-7-access-the-frontend)
+* [Step 6: Fail on demand](#step-6-fail-on-demand)
+* [Step 7: Expose the backend](#step-7-expose-the-backend)
+* [Step 8: Access the frontend](#step-8-access-the-frontend)
 * [Cleaning up](#cleaning-up)
 * [Summary](#summary)
 * [Next steps](#next-steps)
@@ -29,36 +30,11 @@ across cloud providers, data centers, and edge sites.
 
 ## Overview
 
-This example is a basic multi-service HTTP application deployed
-across two Kubernetes clusters, each in its own private data center.
-
-It contains two services:
-
-* A backend service that exposes an `/api/hello` endpoint.  It
-  returns greetings of the form `Hi, <your-name>.  I am <my-name>
-  (<pod>)`.
-
-* A frontend service that connects to the backend.  It sends
-  greetings to the backend and fetches new greetings in response.
-
-The backend service runs in on-prem cluster "private1", and the
-frontend service runs in on-prem cluster "private2".  The private
-sites are linked by a relay site in the public cloud.  Skupper
-enables the frontend to connect to the backend over a secure
-dedicated application network.
-
-<img src="images/entities.svg" style="max-width: 100%;"/>
+An overview
 
 ## Prerequisites
 
-* The `kubectl` command-line tool, version 1.15 or later
-  ([installation guide][install-kubectl])
-
-* Access to at least one Kubernetes cluster, from [any provider you
-  choose][kube-providers]
-
-[install-kubectl]: https://kubernetes.io/docs/tasks/tools/install-kubectl/
-[kube-providers]: https://skupper.io/start/kubernetes.html
+Some prerequisites
 
 ## Step 1: Install the Skupper command-line tool
 
@@ -114,31 +90,22 @@ documentation for yours:
 * [IBM Kubernetes Service](https://skupper.io/start/ibmks.html#cluster-access)
 * [OpenShift](https://skupper.io/start/openshift.html#cluster-access)
 
-_**Private 1:**_
+_**West:**_
 
 ~~~ shell
-export KUBECONFIG=~/.kube/config-private1
+export KUBECONFIG=~/.kube/config-west
 # Enter your provider-specific login command
-kubectl create namespace private1
-kubectl config set-context --current --namespace private1
+kubectl create namespace west
+kubectl config set-context --current --namespace west
 ~~~
 
-_**Private 2:**_
+_**East:**_
 
 ~~~ shell
-export KUBECONFIG=~/.kube/config-private2
+export KUBECONFIG=~/.kube/config-east
 # Enter your provider-specific login command
-kubectl create namespace private2
-kubectl config set-context --current --namespace private2
-~~~
-
-_**Relay:**_
-
-~~~ shell
-export KUBECONFIG=~/.kube/config-relay
-# Enter your provider-specific login command
-kubectl create namespace relay
-kubectl config set-context --current --namespace relay
+kubectl create namespace east
+kubectl config set-context --current --namespace east
 ~~~
 
 ## Step 3: Deploy the frontend and backend
@@ -147,16 +114,16 @@ This example runs the frontend and the backend in separate
 Kubernetes namespaces, on different clusters.
 
 Use `kubectl create deployment` to deploy the frontend in
-namespace `private1` and the backend in namespace
-`private2`.
+namespace `west` and the backend in namespace
+`east`.
 
-_**Private 1:**_
+_**West:**_
 
 ~~~ shell
 kubectl create deployment frontend --image quay.io/skupper/hello-world-frontend
 ~~~
 
-_**Private 2:**_
+_**East:**_
 
 ~~~ shell
 kubectl create deployment backend --image quay.io/skupper/hello-world-backend --replicas 3
@@ -178,7 +145,7 @@ tunnel][minikube-tunnel] before you run `skupper init`.
 
 [minikube-tunnel]: https://skupper.io/start/minikube.html#running-minikube-tunnel
 
-_**Private 1:**_
+_**West:**_
 
 ~~~ shell
 skupper init
@@ -191,13 +158,13 @@ _Sample output:_
 $ skupper init
 Waiting for LoadBalancer IP or hostname...
 Waiting for status...
-Skupper is now installed in namespace 'private1'.  Use 'skupper status' to get more information.
+Skupper is now installed in namespace 'west'.  Use 'skupper status' to get more information.
 
 $ skupper status
-Skupper is enabled for namespace "private1". It is not connected to any other sites. It has no exposed services.
+Skupper is enabled for namespace "west". It is not connected to any other sites. It has no exposed services.
 ~~~
 
-_**Private 2:**_
+_**East:**_
 
 ~~~ shell
 skupper init
@@ -210,29 +177,10 @@ _Sample output:_
 $ skupper init
 Waiting for LoadBalancer IP or hostname...
 Waiting for status...
-Skupper is now installed in namespace 'private2'.  Use 'skupper status' to get more information.
+Skupper is now installed in namespace 'east'.  Use 'skupper status' to get more information.
 
 $ skupper status
-Skupper is enabled for namespace "private2". It is not connected to any other sites. It has no exposed services.
-~~~
-
-_**Relay:**_
-
-~~~ shell
-skupper init
-skupper status
-~~~
-
-_Sample output:_
-
-~~~ console
-$ skupper init
-Waiting for LoadBalancer IP or hostname...
-Waiting for status...
-Skupper is now installed in namespace 'relay'.  Use 'skupper status' to get more information.
-
-$ skupper status
-Skupper is enabled for namespace "relay". It is not connected to any other sites. It has no exposed services.
+Skupper is enabled for namespace "east". It is not connected to any other sites. It has no exposed services.
 ~~~
 
 As you move through the steps below, you can use `skupper status` at
@@ -241,8 +189,6 @@ any time to check your progress.
 ## Step 5: Link your sites
 
 A Skupper _link_ is a channel for communication between two sites.
-Links serve as a transport for application connections and
-requests.
 
 Creating a link requires use of two `skupper` commands in
 conjunction, `skupper token create` and `skupper link create`.
@@ -257,27 +203,35 @@ that generated it.
 token can link to your site.  Make sure that only those you trust
 have access to it.
 
-First, use `skupper token create` in site Private 1 to generate the
-token.  Then, use `skupper link create` in site Private 2 to link
+First, use `skupper token create` in site West to generate the
+token.  Then, use `skupper link create` in site East to link
 the sites.
 
-_**Relay:**_
+_**West:**_
 
 ~~~ shell
-skupper token create ~/relay1.token
-skupper token create ~/relay2.token
+skupper token create ~/secret.token
 ~~~
 
-_**Private 1:**_
+_Sample output:_
 
-~~~ shell
-skupper link create ~/relay1.token
+~~~ console
+$ skupper token create ~/secret.token
+Token written to ~/secret.token
 ~~~
 
-_**Private 2:**_
+_**East:**_
 
 ~~~ shell
-skupper link create ~/relay2.token
+skupper link create ~/secret.token
+~~~
+
+_Sample output:_
+
+~~~ console
+$ skupper link create ~/secret.token
+Site configured to link to <endpoint> (name=link1)
+Check the status of the link using 'skupper link status'.
 ~~~
 
 If your terminal sessions are on different machines, you may need
@@ -285,17 +239,26 @@ to use `scp` or a similar tool to transfer the token securely.  By
 default, tokens expire after a single use or 15 minutes after
 creation.
 
-## Step 6: Expose the backend
+## Step 6: Fail on demand
+
+_**West:**_
+
+~~~ shell
+if [ -n "${SKEWER_FAIL}" ]; then expr 1 / 0; fi
+
+~~~
+
+## Step 7: Expose the backend
 
 We now have our sites linked to form a Skupper network, but no
 services are exposed on it.  Skupper uses the `skupper expose`
 command to select a service from one site for exposure in all the
 linked sites.
 
-Use `skupper expose` to expose the backend service in Private 2 to
-the frontend in Private 1.
+Use `skupper expose` to expose the backend service in East to
+the frontend in West.
 
-_**Private 2:**_
+_**East:**_
 
 ~~~ shell
 skupper expose deployment/backend --port 8080
@@ -308,7 +271,7 @@ $ skupper expose deployment/backend --port 8080
 deployment backend exposed as backend
 ~~~
 
-## Step 7: Access the frontend
+## Step 8: Access the frontend
 
 In order to use and test the application, we need external access
 to the frontend.
@@ -326,7 +289,7 @@ request the `/api/health` endpoint at that address.
 **Note:** The `<external-ip>` field in the following commands is a
 placeholder.  The actual value is an IP address.
 
-_**Private 1:**_
+_**West:**_
 
 ~~~ shell
 kubectl expose deployment/frontend --port 8080 --type LoadBalancer
@@ -356,7 +319,7 @@ navigating to `http://<external-ip>:8080/` in your browser.
 To remove Skupper and the other resources from this exercise, use
 the following commands:
 
-_**Private 1:**_
+_**West:**_
 
 ~~~ shell
 skupper delete
@@ -364,22 +327,20 @@ kubectl delete service/frontend
 kubectl delete deployment/frontend
 ~~~
 
-_**Relay:**_
-
-~~~ shell
-skupper delete
-~~~
-
-_**Private 2:**_
+_**East:**_
 
 ~~~ shell
 skupper delete
 kubectl delete deployment/backend
 ~~~
 
+## Summary
+
+A summary
+
 ## Next steps
 
-Check out the other [examples][examples] on the Skupper website.
+Some next steps
 
 ## About this example
 
